@@ -1,6 +1,57 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
+
+# Overview
+
+In this project, our goal is to design a path planner that is able to create smooth, safe paths for the car to follow along a 3 lane highway with traffic.
+We are provided with the car's localization, sensor fusion data, as well as highway map data that lists the waypoints around the highway, with a regular frequency (every 20 milliseconds).
+The challenge part is how to control the car drive both safely and "efficiently" (change lane if needed)
+
+# Final Result
+Our simulated car can drive safely for 5 miles, could be more if I keep running the simulation. As you can see from the statistics,
+our car is driving at an average speed around 49 mph, which shows that the lane changing is working properly.
+
+![final_result](.\final_result.PNG)
+
+
+# Implementations
+In our project, we choose a very simple process model (constant velocity model) to simplify things. This obviously has its limitation, but it’s a reasonable assumption as the other vehicles in highway do not really change lanes very often.
+In this project, Trajectory layer specifies a certain number of candidate ending points and then use cost functions to select the best ending point. To decide the best trajectory point, we check if our car
+is too close to the car we are trying to follow. If it is, we first find the number of cars in the adjacent lane(s). Check the `findNearest` function in `main.cpp`. If the lane is empty, then we are safe to change the lanes; otherwise we check
+the closest car(s) in the adjacent lane(s). If the car is within our change lane safe distance, then we would stay in the lane. Check the following code block as an example.
+```
+// Check if the left lane is safe
+if (cars_in_left_lane.size() == 0){
+    // If there is no car in the left lane, than it is safe to turn left
+    left_turn_safe = true;
+} else {
+  nearest_cars = findNearest(cars_in_left_lane, car_s, prev_size);
+  // check if the leading and trailing cars are in the dangerours zone
+  // [-cl_safe_dist, cl_safe_dist]
+  if (nearest_cars[0] > cl_safe_dist && nearest_cars[1] > cl_safe_dist){
+    left_turn_safe = true;
+  }
+}
+```
+Things become a little bit tricky when both adjacent lanes are available (suppose the car is in the middle lane). My strategy here is **change to the lane with fewer cars**. I will reduce the probabiltiy that you
+will make another lane changhe later. Check the following code block as an example.
+```
+if (left_turn_safe && right_turn_safe){
+  if (cars_in_left_lane.size() <= cars_in_right_lane.size()){
+    lane = 0; 
+  } else {
+    lane = 2;
+  }
+}
+```
+
+# Reflections
+There are two potential improvements that I plan to implement later.
+
+- If our car is driving on the highway and it is not close to any cars, should we change to the lane with fewest cars in front of us? This is something that I would do when I am driving on the highway.
+- Sometimes the car might "get stuck" in the car pool (other cars are driving at the same speed in front of and next to us). The only way to get out of that is  slow down first and then make a two lanes change, which is not a safe behavior in general.
+
+# Below are from original udacity repo.
 ### Simulator.
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases).
 
