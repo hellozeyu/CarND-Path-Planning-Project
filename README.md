@@ -11,7 +11,7 @@ The challenge part is how to control the car drive both safely and "efficiently"
 Our simulated car can drive safely for 5 miles, could be more if I keep running the simulation. As you can see from the statistics,
 our car is driving at an average speed around 49 mph, which shows that the lane changing is working properly.
 
-![final_result](.\final_result.PNG)
+![final_result](./final_result.PNG)
 
 
 # Implementations
